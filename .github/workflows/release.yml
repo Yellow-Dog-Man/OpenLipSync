@@ -1,4 +1,4 @@
-name: 'Build the solution'
+name: 'Build the solution & push release to NuGet'
 
 on:
   release:
