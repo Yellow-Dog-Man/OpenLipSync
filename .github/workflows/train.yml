@@ -1,0 +1,22 @@
+name: 'Train and publish a model'
+
+on:
+  workflow-dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Sync packages
+        run: uv sync
+      - name: Train model
+        run: |
+          . ./.venv/bin/activate
+          yes | python training/train.py --config training/recipes/tcn_config.toml
+      - uses: actions/upload-artifact@v4
+        with:
+          path: 'model.zip'
