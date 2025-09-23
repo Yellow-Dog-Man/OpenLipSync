@@ -1,0 +1,25 @@
+name: 'Build the solution'
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SOL_DIR: 'inference/OpenLipSync.Inference/OpenLipSync.Inference'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+      - name: Restore solution
+        run: dotnet restore $SOL_DIR
+      - name: Build solution
+        run: dotnet build -c Release -p:Version=${{ github.event.release.tag_name }} $SOL_DIR
+      - name: Package solution
+        run: dotnet pack -c Release -p:Version=${{ github.event.release.tag_name }} $SOL_DIR
+      - name: Push to NuGet
+        run: dotnet push **/*.nupkg -k ${{ secrets.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json
